@@ -1,34 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { AssetsService } from './assets.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
+import { SellAssetDto } from './dto/sell-asset.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('assets')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('assets')
 export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {}
 
   @Post()
-  create(@Body() createAssetDto: CreateAssetDto) {
-    return this.assetsService.create(createAssetDto);
+  @ApiOperation({ summary: 'Create new asset' })
+  create(@Body() createAssetDto: CreateAssetDto, @Req() req) {
+    return this.assetsService.create(createAssetDto, req.user);
   }
 
   @Get()
-  findAll() {
-    return this.assetsService.findAll();
+  @ApiOperation({ summary: 'Get all assets' })
+  findAll(@Req() req) {
+    return this.assetsService.findAll(req.user);
+  }
+
+  @Get('profit-loss')
+  @ApiOperation({ summary: 'Get profit/loss analysis' })
+  getProfitLoss(@Req() req) {
+    return this.assetsService.getProfitLoss(req.user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.assetsService.findOne(+id);
+  @ApiOperation({ summary: 'Get asset by id' })
+  findOne(@Param('id') id: string, @Req() req) {
+    return this.assetsService.findOne(+id, req.user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAssetDto: UpdateAssetDto) {
-    return this.assetsService.update(+id, updateAssetDto);
+  @Post(':id/sell')
+  @ApiOperation({ summary: 'Sell asset' })
+  sell(@Param('id') id: string, @Body() sellAssetDto: SellAssetDto, @Req() req) {
+    return this.assetsService.sell(+id, sellAssetDto, req.user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.assetsService.remove(+id);
+  @ApiOperation({ summary: 'Delete asset' })
+  remove(@Param('id') id: string, @Req() req) {
+    return this.assetsService.remove(+id, req.user);
   }
 }

@@ -18,6 +18,18 @@ export class Asset {
   @Column('decimal', { precision: 10, scale: 2 })
   buyPrice: number; // giá mua
 
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  sellPrice: number; // giá bán (nếu đã bán)
+
+  @Column({ default: false })
+  isSold: boolean; // trạng thái đã bán hay chưa
+
   @CreateDateColumn()
-  createdAt: Date;
+  buyDate: Date; // ngày mua
+
+  @Column({ type: 'timestamp', nullable: true })
+  sellDate: Date; // ngày bán (nếu đã bán)
+
+  @Column({ type: 'text', nullable: true })
+  note: string; // ghi chú
 }
