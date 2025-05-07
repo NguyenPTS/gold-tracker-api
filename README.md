@@ -86,16 +86,122 @@ http://localhost:3002/api
 - `DELETE /users/:id` - Xóa người dùng
 
 #### Assets
-- `POST /assets` - Tạo tài sản mới
-- `GET /assets` - Lấy danh sách tài sản
-- `GET /assets/:id` - Lấy thông tin tài sản
-- `PATCH /assets/:id` - Cập nhật tài sản
-- `DELETE /assets/:id` - Xóa tài sản
-- `GET /assets/profit-loss` - Xem báo cáo lãi/lỗ
+- `POST /assets` - Tạo tài sản mới (vàng) với thông tin loại vàng, số lượng, giá mua và ghi chú
+- `GET /assets` - Lấy danh sách tất cả tài sản của người dùng hiện tại
+- `GET /assets/:id` - Lấy thông tin chi tiết của một tài sản theo ID
+- `POST /assets/:id/sell` - Bán một tài sản vàng với giá bán được chỉ định
+- `DELETE /assets/:id` - Xóa một tài sản khỏi danh mục
+- `GET /assets/profit-loss` - Xem báo cáo phân tích lãi/lỗ cho toàn bộ danh mục đầu tư
 
 #### Gold Price
-- `GET /gold-price` - Lấy giá vàng hiện tại
-- `GET /gold-price/history` - Lấy lịch sử giá vàng
+- `GET /gold/prices/latest` - Lấy giá vàng hiện tại
+- `GET /gold/prices/history` - Lấy lịch sử giá vàng
+- `GET /gold/prices/type/:type` - Lấy giá vàng theo loại (SJC, DOJI, v.v)
+
+## Chi tiết API Assets
+
+### 1. Tạo tài sản mới - POST /assets
+
+**Mô tả:** Tạo một tài sản vàng mới trong danh mục của người dùng hiện tại
+
+**Request Body:**
+```json
+{
+  "type": "SJC",
+  "amount": 1.0,
+  "buyPrice": 5000000,
+  "note": "Mua vàng đầu tư dài hạn"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "type": "SJC",
+  "amount": 1.0,
+  "buyPrice": 5000000,
+  "note": "Mua vàng đầu tư dài hạn",
+  "isSold": false,
+  "buyDate": "2023-10-15T08:15:30.000Z",
+  "sellPrice": null,
+  "sellDate": null
+}
+```
+
+### 2. Xem tất cả tài sản - GET /assets
+
+**Mô tả:** Lấy danh sách tất cả tài sản của người dùng đã đăng nhập
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "type": "SJC",
+    "amount": 1.0,
+    "buyPrice": 5000000,
+    "note": "Mua vàng đầu tư dài hạn",
+    "isSold": false,
+    "buyDate": "2023-10-15T08:15:30.000Z",
+    "sellPrice": null,
+    "sellDate": null
+  },
+  {
+    "id": 2,
+    "type": "DOJI",
+    "amount": 0.5,
+    "buyPrice": 2450000,
+    "note": "Quà tặng sinh nhật",
+    "isSold": true,
+    "buyDate": "2023-09-20T10:30:00.000Z",
+    "sellPrice": 2600000,
+    "sellDate": "2023-10-25T14:20:15.000Z"
+  }
+]
+```
+
+### 3. Bán tài sản - POST /assets/:id/sell
+
+**Mô tả:** Cập nhật trạng thái tài sản sang đã bán, thêm giá bán và ngày bán (tự động)
+
+**Request Body:**
+```json
+{
+  "sellPrice": 5500000
+}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "type": "SJC",
+  "amount": 1.0,
+  "buyPrice": 5000000,
+  "note": "Mua vàng đầu tư dài hạn",
+  "isSold": true,
+  "buyDate": "2023-10-15T08:15:30.000Z",
+  "sellPrice": 5500000,
+  "sellDate": "2023-11-20T09:45:12.000Z"
+}
+```
+
+### 4. Phân tích lãi/lỗ - GET /assets/profit-loss
+
+**Mô tả:** Lấy báo cáo phân tích lãi/lỗ cho toàn bộ danh mục đầu tư
+
+**Response:**
+```json
+{
+  "totalInvestment": 7450000,
+  "currentValue": 8100000,
+  "realizedProfit": 150000,
+  "unrealizedProfit": 500000,
+  "totalProfit": 650000,
+  "profitPercentage": 8.72
+}
+```
 
 ## Cấu trúc dự án
 
