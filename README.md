@@ -1,98 +1,136 @@
+# Gold Tracker API
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Mô tả
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Gold Tracker là một ứng dụng theo dõi và quản lý tài sản vàng, được xây dựng bằng NestJS. Ứng dụng cho phép người dùng:
 
-## Description
+- Đăng nhập/đăng ký tài khoản (bao gồm cả đăng nhập bằng Google)
+- Theo dõi giá vàng theo thời gian thực
+- Quản lý danh mục tài sản vàng
+- Tính toán lãi/lỗ cho các khoản đầu tư
+- Xem biểu đồ phân tích xu hướng
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Cài đặt
 
 ```bash
+# Cài đặt dependencies
 $ npm install
+
+# Tạo file .env từ mẫu
+$ cp .env.example .env
+
+# Cập nhật các biến môi trường trong file .env
 ```
 
-## Compile and run the project
+## Cấu hình môi trường
+
+Tạo file `.env` với các biến sau:
+
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+DB_DATABASE=gold_tracker
+
+# JWT
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRATION=1d
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=http://localhost:3002/auth/google/callback
+
+# Server
+PORT=3002
+```
+
+## Chạy ứng dụng
 
 ```bash
-# development
+# Chế độ development
 $ npm run start
 
-# watch mode
+# Chế độ watch
 $ npm run start:dev
 
-# production mode
+# Chế độ production
 $ npm run start:prod
 ```
 
-## Run tests
+## API Documentation
+
+Sau khi chạy ứng dụng, bạn có thể truy cập Swagger UI tại:
+```
+http://localhost:3002/api
+```
+
+### Các API chính
+
+#### Authentication
+- `POST /auth/login` - Đăng nhập bằng email/password
+- `GET /auth/google` - Đăng nhập bằng Google
+- `GET /auth/google/callback` - Callback URL cho Google OAuth
+
+#### Users
+- `POST /users/sample-data` - Tạo tài khoản mẫu
+- `GET /users` - Lấy danh sách người dùng
+- `GET /users/:id` - Lấy thông tin người dùng
+- `PATCH /users/:id` - Cập nhật thông tin người dùng
+- `DELETE /users/:id` - Xóa người dùng
+
+#### Assets
+- `POST /assets` - Tạo tài sản mới
+- `GET /assets` - Lấy danh sách tài sản
+- `GET /assets/:id` - Lấy thông tin tài sản
+- `PATCH /assets/:id` - Cập nhật tài sản
+- `DELETE /assets/:id` - Xóa tài sản
+- `GET /assets/profit-loss` - Xem báo cáo lãi/lỗ
+
+#### Gold Price
+- `GET /gold-price` - Lấy giá vàng hiện tại
+- `GET /gold-price/history` - Lấy lịch sử giá vàng
+
+## Cấu trúc dự án
+
+```
+src/
+├── assets/                 # Module quản lý tài sản
+├── auth/                   # Module xác thực
+├── gold-price/            # Module theo dõi giá vàng
+├── users/                 # Module quản lý người dùng
+├── app.module.ts          # Module gốc
+└── main.ts               # File khởi động ứng dụng
+```
+
+## Công nghệ sử dụng
+
+- [NestJS](https://nestjs.com/) - Framework Node.js
+- [TypeORM](https://typeorm.io/) - ORM cho database
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Passport](https://www.passportjs.org/) - Authentication
+- [JWT](https://jwt.io/) - JSON Web Token
+- [Swagger](https://swagger.io/) - API Documentation
+
+## Testing
 
 ```bash
-# unit tests
+# Unit tests
 $ npm run test
 
 # e2e tests
 $ npm run test:e2e
 
-# test coverage
+# Test coverage
 $ npm run test:cov
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT licensed](LICENSE)
