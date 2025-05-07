@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateSampleDataDto } from './dto/create-sample-data.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -22,17 +23,42 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async findAll() {
-    return this.userRepository.find({
-      select: ['id', 'username', 'email', 'firstName', 'lastName', 'picture'] // Không trả về password
+  async createSampleData(createSampleDataDto: CreateSampleDataDto) {
+    // Kiểm tra xem user đã tồn tại chưa
+    const existingUser = await this.userRepository.findOne({
+      where: [
+        { email: createSampleDataDto.email },
+        { username: createSampleDataDto.username }
+      ]
     });
+
+    if (existingUser) {
+      throw new BadRequestException('User already exists');
+    }
+
+    // Tạo user mới
+    const hashedPassword = await bcrypt.hash(createSampleDataDto.password, 10);
+    const user = this.userRepository.create({
+      ...createSampleDataDto,
+      password: hashedPassword,
+    });
+
+    const savedUser = await this.userRepository.save(user);
+    console.log('Created sample user:', {
+      id: savedUser.id,
+      email: savedUser.email,
+      username: savedUser.username
+    });
+
+    return savedUser;
+  }
+
+  async findAll() {
+    return this.userRepository.find();
   }
 
   async findOne(id: number) {
-    return this.userRepository.findOne({ 
-      where: { id },
-      select: ['id', 'username', 'email', 'firstName', 'lastName', 'picture']
-    });
+    return this.userRepository.findOne({ where: { id } });
   }
 
   async findByEmail(email: string) {
@@ -50,43 +76,33 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    // Nếu có password mới, hash nó
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
-    
     await this.userRepository.update(id, updateUserDto);
     return this.findOne(id);
   }
 
   async remove(id: number) {
     const user = await this.findOne(id);
-    if (user) {
-      await this.userRepository.delete(id);
-      return user;
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
-    return null;
+    return this.userRepository.remove(user);
   }
 
   async validatePassword(user: User, password: string): Promise<boolean> {
-    console.log('Validating password for user:', { 
-      id: user?.id,
-      hasPassword: !!user?.password,
-      providedPassword: !!password 
-    });
-
-    if (!user || !user.password || !password) {
-      console.log('Missing user or password');
+    if (!user.password) {
+      console.log('User has no password');
       return false;
     }
-
+    
     try {
-      console.log('Comparing passwords...');
       const isValid = await bcrypt.compare(password, user.password);
-      console.log('Password comparison result:', isValid);
+      console.log('Password validation result:', isValid);
       return isValid;
     } catch (error) {
-      console.error('Password validation error:', error);
+      console.error('Error validating password:', error);
       return false;
     }
   }
