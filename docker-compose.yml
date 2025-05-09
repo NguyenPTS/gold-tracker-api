@@ -20,8 +20,11 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
+      - FRONTEND_URL=https://gold-tracker-ncr94mia9-nguyenpts-projects.vercel.app
+      - COOKIE_DOMAIN=gold-tracker-ncr94mia9-nguyenpts-projects.vercel.app
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./.env.docker:/app/.env
     restart: unless-stopped
@@ -38,6 +41,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data: 

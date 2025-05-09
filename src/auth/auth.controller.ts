@@ -42,13 +42,16 @@ export class AuthController {
         picture: result.user.picture
       };
 
+      const cookieDomain = this.configService.get('COOKIE_DOMAIN') || 'localhost';
+      const isProduction = this.configService.get('NODE_ENV') === 'production';
+
       // Set access token cookie
       console.log('Setting access_token cookie');
       res.cookie('access_token', token, {
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: 'lax',
-        domain: 'localhost',
+        domain: cookieDomain,
         path: '/',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
       });
@@ -57,9 +60,9 @@ export class AuthController {
       console.log('Setting user_info cookie');
       res.cookie('user_info', JSON.stringify(userInfo), {
         httpOnly: false,
-        secure: false,
+        secure: isProduction,
         sameSite: 'lax',
-        domain: 'localhost',
+        domain: cookieDomain,
         path: '/',
         maxAge: 24 * 60 * 60 * 1000
       });
@@ -68,23 +71,35 @@ export class AuthController {
       console.log('Cookie headers:', res.getHeaders());
 
       // Redirect với token trong URL để đảm bảo
-      const redirectUrl = `http://localhost:3000/auth-success?token=${token}`;
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+      const redirectUrl = `${frontendUrl}/auth-success?token=${token}`;
       console.log('Redirecting to:', redirectUrl);
       return res.redirect(302, redirectUrl);
     } catch (error) {
       console.error('Google auth error:', error);
-      return res.redirect(302, 'http://localhost:3000/auth-error');
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+      return res.redirect(302, `${frontendUrl}/auth-error`);
     }
   }
 
   @Get('logout')
   async logout(@Res() res: Response) {
+    const cookieDomain = this.configService.get('COOKIE_DOMAIN') || 'localhost';
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+    
     // Clear cookies
-    res.clearCookie('access_token');
-    res.clearCookie('user');
+    res.clearCookie('access_token', {
+      domain: cookieDomain,
+      path: '/',
+    });
+    
+    res.clearCookie('user_info', {
+      domain: cookieDomain,
+      path: '/',
+    });
     
     // Redirect to home page
-    return res.redirect(302, '/');
+    return res.redirect(302, frontendUrl);
   }
 
   @Get('me')
