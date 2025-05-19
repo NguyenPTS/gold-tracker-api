@@ -6,8 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: gold-tracker-api
-    ports:
-      - "3002:3002"
+    # Using internal port only, Nginx will handle external access
+    expose:
+      - "3002"
     environment:
       - NODE_ENV=production
       - PORT=3002
@@ -20,20 +21,22 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
-      - FRONTEND_URL=https://gold-tracker-ncr94mia9-nguyenpts-projects.vercel.app
-      - COOKIE_DOMAIN=gold-tracker-ncr94mia9-nguyenpts-projects.vercel.app
+      - FRONTEND_URL=${FRONTEND_URL}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./.env.docker:/app/.env
     restart: unless-stopped
+    networks:
+      - app-network
 
   postgres:
     image: postgres:16-alpine
     container_name: gold-tracker-postgres
-    ports:
-      - "5435:5432"
+    expose:
+      - "5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -46,6 +49,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: gold-tracker-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/www:/var/www/html
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - app-network
 
 volumes:
-  postgres_data: 
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge 
