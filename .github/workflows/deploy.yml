@@ -1,0 +1,51 @@
+name: Backend Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  WORKSPACE: /home/backend
+  PROJECT_NAME: gold-tracker-api
+
+jobs:
+  deploy:
+    name: Deploy Backend
+    runs-on: self-hosted
+    steps:
+      - name: Debug path variables
+        run: |
+          echo "WORKSPACE=$WORKSPACE"
+          echo "PROJECT_NAME=$PROJECT_NAME"
+          echo "PWD=$(pwd)"
+          
+      - name: Deploy
+        run: |
+          echo "Deploying backend API"
+          cd $WORKSPACE/$PROJECT_NAME
+          git config credential.helper '!f() { sleep 1; echo "username=${{ secrets.GH_USER }}"; echo "password=${{ secrets.GH_TOKEN }}"; }; f'
+          git checkout main
+          git pull
+          
+          # Check if Docker containers exist and remove them
+          CONTAINER_EXISTS=$(docker-compose ps -q api)
+          if [ -n "$CONTAINER_EXISTS" ]; then
+            echo "Stopping existing containers"
+            docker-compose down
+          fi
+          
+          # Check if Docker image exists and remove it
+          IMAGE_EXISTS=$(docker images -q gold-tracker-api)
+          if [ -n "$IMAGE_EXISTS" ]; then
+            echo "Removing existing image"
+            docker image rm gold-tracker-api
+          fi
+          
+          # Build and start containers
+          echo "Building and starting containers"
+          docker-compose build --no-cache
+          docker-compose up -d
+          
+          echo "Deployment completed successfully" 
