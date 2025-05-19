@@ -12,7 +12,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy Backendmain
+    name: Deploy Backend
     runs-on: self-hosted
     steps:
       - name: Debug path variables
@@ -25,9 +25,38 @@ jobs:
         run: |
           echo "Deploying backend API"
           cd $WORKSPACE/$PROJECT_NAME
+          
+          # Configure git credentials
           git config credential.helper '!f() { sleep 1; echo "username=${{ secrets.GH_USER }}"; echo "password=${{ secrets.GH_TOKEN }}"; }; f'
-          git checkout master
-          git pull
+          
+          # Fetch latest changes
+          git fetch origin master
+          
+          # Check if local repository exists and has commits
+          if [ -d .git ] && git rev-parse HEAD > /dev/null 2>&1; then
+            # Try normal pull first
+            git pull origin master || {
+              echo "Normal pull failed, trying alternative approaches"
+              
+              # Save local changes if any
+              git stash || true
+              
+              # Reset to match remote (this will discard local changes)
+              git reset --hard origin/master || {
+                # If reset fails, try clone from scratch
+                cd $WORKSPACE
+                rm -rf $PROJECT_NAME
+                git clone https://github.com/NguyenPTS/gold-tracker-api.git $PROJECT_NAME
+                cd $PROJECT_NAME
+              }
+            }
+          else
+            # Fresh clone if no git repo
+            cd $WORKSPACE
+            rm -rf $PROJECT_NAME
+            git clone https://github.com/NguyenPTS/gold-tracker-api.git $PROJECT_NAME
+            cd $PROJECT_NAME
+          fi
           
           # Check if Docker containers exist and remove them
           CONTAINER_EXISTS=$(docker-compose ps -q api)
