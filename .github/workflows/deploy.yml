@@ -59,7 +59,7 @@ jobs:
           fi
           
           # Check if Docker containers exist and remove them
-          CONTAINER_EXISTS=$(docker-compose ps -q api)
+          CONTAINER_EXISTS=$(docker-compose ps -q giavang-api)
           if [ -n "$CONTAINER_EXISTS" ]; then
             echo "Stopping existing containers"
             docker-compose down
