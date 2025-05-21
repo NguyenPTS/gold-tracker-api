@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 export class ApiKeyMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const apiKey = req.headers['x-api-key'] || req.query.api_key;
-    const validApiKey = process.env.API_KEY || 'your-secret-api-key';
+    const validApiKey = process.env.API_KEY ;
 
     if (apiKey !== validApiKey) {
       throw new UnauthorizedException('Invalid API Key');
