@@ -84,7 +84,7 @@ export class AuthController {
 
   @Get('logout')
   async logout(@Res() res: Response) {
-    const cookieDomain = this.configService.get('COOKIE_DOMAIN') || ;
+    const cookieDomain = this.configService.get('COOKIE_DOMAIN') ;
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://giavang.trungthanhdev.com';
     
     // Clear cookies
