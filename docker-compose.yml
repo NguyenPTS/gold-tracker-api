@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  api:
+  giavang-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,6 +28,18 @@ services:
     volumes:
       - ./.env.docker:/app/.env
     restart: unless-stopped
+    networks:
+      - traefik_default
+      - default
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik_default'
+      - 'traefik.http.routers.giavang-api.entrypoints=http'
+      - 'traefik.http.routers.giavang-api.rule=Host(`giavang-api.trungthanhdev.com`)'
+      - 'traefik.http.routers.giavang-api-secure.entrypoints=https'
+      - 'traefik.http.routers.giavang-api-secure.rule=Host(`giavang-api.trungthanhdev.com`)'
+      - 'traefik.http.routers.giavang-api-secure.tls.certresolver=letsencrypt'
+
 
   postgres:
     image: postgres:16-alpine
