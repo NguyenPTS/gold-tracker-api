@@ -20,8 +20,8 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
-      - FRONTEND_URL=https://gold-tracker-ncr94mia9-nguyenpts-projects.vercel.app
-      - COOKIE_DOMAIN=gold-tracker-ncr94mia9-nguyenpts-projects.vercel.app
+      - FRONTEND_URL=https://giavang.trungthanhdev.com
+      - COOKIE_DOMAIN=giavang.trungthanhdev.com
     depends_on:
       postgres:
         condition: service_healthy
