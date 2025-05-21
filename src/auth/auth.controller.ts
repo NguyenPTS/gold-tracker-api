@@ -71,21 +71,21 @@ export class AuthController {
       console.log('Cookie headers:', res.getHeaders());
 
       // Redirect với token trong URL để đảm bảo
-      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://giavang.trungthanhdev.com';
       const redirectUrl = `${frontendUrl}/auth-success?token=${token}`;
       console.log('Redirecting to:', redirectUrl);
       return res.redirect(302, redirectUrl);
     } catch (error) {
       console.error('Google auth error:', error);
-      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://giavang.trungthanhdev.com';
       return res.redirect(302, `${frontendUrl}/auth-error`);
     }
   }
 
   @Get('logout')
   async logout(@Res() res: Response) {
-    const cookieDomain = this.configService.get('COOKIE_DOMAIN') || 'localhost';
-    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+    const cookieDomain = this.configService.get('COOKIE_DOMAIN') || ;
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://giavang.trungthanhdev.com';
     
     // Clear cookies
     res.clearCookie('access_token', {
