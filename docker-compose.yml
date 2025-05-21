@@ -29,11 +29,11 @@ services:
       - ./.env.docker:/app/.env
     restart: unless-stopped
     networks:
-      - traefik_default
+      - traefik
       - default
     labels:
       - 'traefik.enable=true'
-      - 'traefik.docker.network=traefik_default'
+      - 'traefik.docker.network=traefik'
       - 'traefik.http.routers.giavang-api.entrypoints=http'
       - 'traefik.http.routers.giavang-api.rule=Host(`giavang-api.trungthanhdev.com`)'
       - 'traefik.http.routers.giavang-api-secure.entrypoints=https'
