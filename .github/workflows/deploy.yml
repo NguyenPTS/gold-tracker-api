@@ -21,6 +21,14 @@ jobs:
           echo "PROJECT_NAME=$PROJECT_NAME"
           echo "PWD=$(pwd)"
           
+      - name: Copy env file
+        run: |
+          if [ -f /home/backend/.env.docker ]; then
+            cp /home/backend/.env.docker $WORKSPACE/$PROJECT_NAME/.env.docker
+          else
+            echo "WARNING: /home/backend/.env.docker not found! Please upload your .env.docker to /home/backend before deploy."
+          fi
+          
       - name: Deploy
         run: |
           echo "Deploying backend API"
