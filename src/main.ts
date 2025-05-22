@@ -38,7 +38,7 @@ async function bootstrap() {
     origin: [frontendUrl, 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With','x-api-key'],
     exposedHeaders: ['Set-Cookie', 'Authorization'],
     preflightContinue: false,
     optionsSuccessStatus: 204
