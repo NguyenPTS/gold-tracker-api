@@ -40,3 +40,4 @@ docker-compose down
 - Khi triển khai lên môi trường production, hãy thay đổi các thông tin nhạy cảm trong file `.env.docker`
 - Đảm bảo GOOGLE_CALLBACK_URL đã được cấu hình đúng trong Google Cloud Console
 - Nếu cần thay đổi cổng, hãy cập nhật trong file `docker-compose.yml` 
+//tetsdeploy
