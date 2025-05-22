@@ -106,7 +106,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   getProfile(@Req() req) {
     return req.user;
-  }
+  }///
 
   @Post('login')
   @ApiOperation({ summary: 'Login with email and password' })
