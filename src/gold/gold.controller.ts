@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { GoldService } from './gold.service';
 import { CreateGoldDto } from './dto/create-gold.dto';
 import { UpdateGoldDto } from './dto/update-gold.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
