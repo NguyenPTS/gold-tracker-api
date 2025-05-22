@@ -28,7 +28,7 @@ export class AuthService {
       let user = await this.userRepository.findOne({
         where: { email: req.user.email }
       });
-
+      //
       // Nếu user chưa tồn tại, tạo mới
       if (!user) {
         console.log('Creating new user from Google data');
