@@ -4,6 +4,8 @@ import { GoldService } from './gold.service';
 import { GoldController } from './gold.controller';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Gold } from './entities/gold.entity';
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       ttl: 60, // cache trong 60 giây
       max: 100, // tối đa 100 items trong cache
     }),
+    TypeOrmModule.forFeature([Gold]),
   ],
   controllers: [GoldController],
   providers: [GoldService],
