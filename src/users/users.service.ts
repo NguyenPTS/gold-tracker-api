@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateSampleDataDto } from './dto/create-sample-data.dto';
+import { RegisterDto } from '../auth/dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -153,5 +154,10 @@ export class UsersService {
       console.error('Error creating test account:', error);
       throw error;
     }
+  }
+
+  async register(registerDto: RegisterDto) {
+    const user = await this.create(registerDto);
+    return user;
   }
 }

@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { LoginDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -122,6 +122,36 @@ export class AuthService {
       username: user.username,
     };
 
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    };
+  }
+
+  async register(registerDto: RegisterDto) {
+    // Kiểm tra email đã tồn tại chưa
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new UnauthorizedException('Email đã được sử dụng');
+    }
+    // Tạo user mới
+    const user = await this.usersService.create({
+      email: registerDto.email,
+      password: registerDto.password,
+      username: registerDto.email.split('@')[0],
+    });
+    // Tạo JWT token
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+    };
     return {
       access_token: this.jwtService.sign(payload),
       user: {

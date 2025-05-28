@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/auth.dto';
+import { RegisterDto } from './dto/auth.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -118,6 +119,12 @@ export class AuthController {
   @Post('create-test-account')
   @ApiOperation({ summary: 'Create test account' })
   async createTestAccount() {
-    return this.usersService.createTestAccount();
+   }
+  
+
+  @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 }
