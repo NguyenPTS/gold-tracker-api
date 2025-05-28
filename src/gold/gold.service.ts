@@ -7,6 +7,10 @@ import { ConfigService } from '@nestjs/config';
 import { map, catchError } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Gold } from './entities/gold.entity';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class GoldService {
@@ -16,6 +20,8 @@ export class GoldService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    @InjectRepository(Gold)
+    private goldRepository: Repository<Gold>,
   ) {}
 
   create(createGoldDto: CreateGoldDto) {
@@ -95,5 +101,29 @@ export class GoldService {
       console.error(`Error fetching prices for type ${type}:`, error);
       throw error;
     }
+  }
+
+  async saveLatestPricesToDb() {
+    const prices = await this.getLatestPrices();
+    for (const price of prices) {
+      // Check if already exists (type + createdAt)
+      const exists = await this.goldRepository.findOne({
+        where: { type: price.type, createdAt: new Date(price.timestamp) }
+      });
+      if (!exists) {
+        await this.goldRepository.save({
+          type: price.type,
+          buy: price.buyPrice,
+          sell: price.sellPrice,
+          createdAt: new Date(price.timestamp)
+        });
+      }
+    }
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async handleCron() {
+    await this.saveLatestPricesToDb();
+    console.log('Đã lưu giá vàng mới vào DB');
   }
 }
