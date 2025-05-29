@@ -11,6 +11,7 @@ import { User } from './users/entities/user.entity';
 import { Asset } from './assets/entities/asset.entity';
 import { ApiKeyMiddleware } from './api-key.middleware';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CurrencyModule } from './currency/currency.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AssetsModule,
     AuthModule,
     ScheduleModule.forRoot(),
+    CurrencyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
