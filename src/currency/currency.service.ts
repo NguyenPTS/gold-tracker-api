@@ -11,11 +11,11 @@ export class CurrencyService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async getRate(currency: string): Promise<number> {
-    const cacheKey = `rate_${currency}_VND`;
+  async getRate(currency: string, targetCurrency: string): Promise<number> {
+    const cacheKey = `rate_${currency}_${targetCurrency}`;
     let rate = await this.cacheManager.get<number>(cacheKey);
     if (rate === undefined || rate === null) {
-      const url = `https://hexarate.paikama.co/api/rates/latest/${currency}?target=VND`;
+      const url = `https://hexarate.paikama.co/api/rates/latest/${currency}?target=${targetCurrency}`;
       const response = await this.httpService.get(url).toPromise();
       rate = response?.data?.mid ?? 0;
       await this.cacheManager.set(cacheKey, rate, 60); // cache 60s
@@ -27,14 +27,14 @@ export class CurrencyService {
     const results = await Promise.all(
       currencies.map(async (currency) => ({
         currency,
-        rate: await this.getRate(currency),
+        rate: await this.getRate(currency, 'VND'),
       }))
     );
     return results;
   }
 
-  async convert(currency: string, amount: number): Promise<number> {
-    const rate = await this.getRate(currency);
+  async convert(currency: string, targetCurrency: string, amount: number): Promise<number> {
+    const rate = await this.getRate(currency, targetCurrency);
     return amount * rate;
   }
 }
