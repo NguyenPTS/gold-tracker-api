@@ -29,7 +29,6 @@ services:
     restart: unless-stopped
     networks:
       - traefik
-      - default
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=traefik'
