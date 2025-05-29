@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   giavang-api:
     build:
@@ -29,6 +31,7 @@ services:
     restart: unless-stopped
     networks:
       - traefik
+      - backend  # kết nối nội bộ với postgres
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=traefik'
@@ -55,6 +58,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend  # nằm cùng network với giavang-api để kết nối được
 
 volumes:
   postgres_data:
@@ -62,5 +67,5 @@ volumes:
 networks:
   traefik:
     external: true
-  default:
+  backend:
     driver: bridge
